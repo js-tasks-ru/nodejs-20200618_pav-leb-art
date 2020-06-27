@@ -7,6 +7,7 @@ class LimitSizeStream extends stream.Transform {
     super(options);
     
     if (options.limit) {
+      // this.setEncoding('utf8')
       if (typeof(options.limit) !== 'number') throw new TypeError('Limit option must be number');
 
       this.totalSize = 0;
