@@ -21,11 +21,11 @@ server.on('request', (req, res) => {
 		case 'POST':
 
 			const limitStream = new LimitSizeStream({
-				limit: 10 ** 6
+				limit: 10 ** 6,
 			});
 
 			const writeStream = fs.createWriteStream(filepath, {
-				flags: 'ax'
+				flags: 'ax',
 			});
 
 			let deleteFlag = false;
@@ -33,22 +33,22 @@ server.on('request', (req, res) => {
 			limitStream.on('error', (err) => {
 				res.statusCode = err.code === 'LIMIT_EXCEEDED' ? 413 : 500;
 				deleteFlag = true;
-				res.end()
+				res.end(err.code);
 			})
 
 			writeStream.on('error', (err) => {
 				res.statusCode = err.code === 'EEXIST' ? 409 : 500;
-				res.end()
+				res.end(err.code);
 			})
 
 			writeStream.on('close', () => {
 				res.statusCode = 201;
-				res.end()
+				res.end('Success');
 			})
 
-			req.pipe(limitStream).pipe(writeStream)
+			req.pipe(limitStream).pipe(writeStream);
 
-			// ERR_INVALID_ARG_TYPE
+			// // ERR_INVALID_ARG_TYPE
 			// stream.pipeline(
 			// 	req,
 			// 	limitStream,
@@ -72,7 +72,7 @@ server.on('request', (req, res) => {
 			// 		} else {
 			// 			res.statusCode = 201;
 			// 		}
-			// 		res.end();
+			// 		res.end('Server response');
 			// 	}
 			// )
 
