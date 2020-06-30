@@ -33,12 +33,12 @@ server.on('request', (req, res) => {
 			limitStream.on('error', (err) => {
 				res.statusCode = err.code === 'LIMIT_EXCEEDED' ? 413 : 500;
 				deleteFlag = true;
-				res.end(err.code);
+				res.end('File is too big');
 			})
 
 			writeStream.on('error', (err) => {
 				res.statusCode = err.code === 'EEXIST' ? 409 : 500;
-				res.end(err.code);
+				res.end('File already exist');
 			})
 
 			writeStream.on('close', () => {
