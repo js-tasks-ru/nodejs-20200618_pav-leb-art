@@ -29,57 +29,58 @@ server.on('request', (req, res) => {
 	
 				let deleteFlag = false;
 	
-				limitStream.on('error', (err) => {
-					if(!res.finished) {
-						res.statusCode = err.code === 'LIMIT_EXCEEDED' ? 413 : 500;
-						res.end('File is too big');
-					}
-					deleteFlag = true;
-				})
+				// limitStream.on('error', (err) => {
+				// 	if(!res.finished) {
+				// 		res.statusCode = err.code === 'LIMIT_EXCEEDED' ? 413 : 500;
+				// 		res.end('File is too big');
+				// 	}
+				// 	deleteFlag = true;
+				// })
 	
-				writeStream.on('error', (err) => {
-					if(!res.finished) {
-						res.statusCode = err.code === 'EEXIST' ? 409 : 500;
-						res.end('File already exist');
-					}
-				})
+				// writeStream.on('error', (err) => {
+				// 	if(!res.finished) {
+				// 		res.statusCode = err.code === 'EEXIST' ? 409 : 500;
+				// 		res.end('File already exist');
+				// 	}
+				// })
 	
-				writeStream.on('close', () => {		
-					if(!res.finished) {
-						res.statusCode = 201;
-						res.end('Success');
-					}
-				})
+				// writeStream.on('close', () => {		
+				// 	if(!res.finished) {
+				// 		res.statusCode = 201;
+				// 		res.end('Success');
+				// 	}
+				// })
 	
-				req.pipe(limitStream).pipe(writeStream);
+				// req.pipe(limitStream).pipe(writeStream);
 	
 				// // ERR_INVALID_ARG_TYPE
-				// stream.pipeline(
-				// 	req,
-				// 	limitStream,
-				// 	writeStream,
-				// 	(err) => {
-				// 		if (err) {
-				// 			switch (err.code) {
-				// 				case 'LIMIT_EXCEEDED':
-				// 					res.statusCode = 413;
-				// 					deleteFlag = true
-				// 					break;
+				
+				stream.pipeline(
+					req,
+					limitStream,
+					writeStream,
+					(err) => {
+						if (err) {
+							switch (err.code) {
+								case 'LIMIT_EXCEEDED':
+									res.statusCode = 413;
+									deleteFlag = true
+									break;
 	
-				// 				case 'EEXIST':
-				// 					res.statusCode = 409;
-				// 					break;
+								case 'EEXIST':
+									res.statusCode = 409;
+									break;
 	
-				// 				default:
-				// 					res.statusCode = 500;
-				// 					break;
-				// 			}
-				// 		} else {
-				// 			res.statusCode = 201;
-				// 		}
-				// 		res.end('Server response');
-				// 	}
-				// )
+								default:
+									res.statusCode = 500;
+									break;
+							}
+						} else {
+							res.statusCode = 201;
+						}
+						res.end('Server response');
+					}
+				)
 	
 				res.on('close', () => {
 					// console.log('res', res.finished);
