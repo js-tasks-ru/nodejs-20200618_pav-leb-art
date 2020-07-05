@@ -24,7 +24,6 @@ router.post('/publish', async (ctx, next) => {
     if(!ctx.request.body.message) {
         ctx.status = 204;
         ctx.message = 'Empty message';
-
         return
     }   
     subscribers.forEach(resolve => {
