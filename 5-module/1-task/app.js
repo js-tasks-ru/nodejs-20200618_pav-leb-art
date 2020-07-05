@@ -12,9 +12,7 @@ let subscribers = {};
 
 router.get('/subscribe', async (ctx, next) => {
     const id = ctx.request.query.r;
-    subscribers[id] = {
-        ctx,
-    }
+    subscribers[id] = new Object();
 
     ctx.res.on('close', () => {
         delete subscribers[id];
@@ -22,29 +20,27 @@ router.get('/subscribe', async (ctx, next) => {
 
     await new Promise((resolve, reject) => {
         subscribers[id].resolve = resolve;
+    }).then(message => {
+        ctx.response.body = message;
+        ctx.status = 200;
+        ctx.message = 'Message recieved';
     })
-
-    ctx.status = 200;
-    ctx.message = 'Subscribed'
 });
 
 router.post('/publish', async (ctx, next) => {
     if(!ctx.request.body.message) {
-        ctx.response.status = 204;
-        ctx.response.message = 'Empty message';
+        ctx.status = 204;
+        ctx.message = 'Empty message';
 
         return
     }   
 
     for(let id in subscribers) {
-        let subscriberContext = subscribers[id].ctx;
-        subscriberContext.status = 200;
-        subscriberContext.body = ctx.request.body.message;
-        subscribers[id].resolve();
+        subscribers[id].resolve(ctx.request.body.message);
     }
 
-    ctx.response.status = 200;
-    ctx.response.message = 'Message published';
+    ctx.status = 200;
+    ctx.message = 'Message published';
 });
 
 app.use(router.routes());
