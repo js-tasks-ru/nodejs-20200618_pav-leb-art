@@ -14,7 +14,6 @@ router.get('/subscribe', async (ctx, next) => {
     const id = ctx.request.query.r;
     subscribers[id] = {
         ctx,
-        done: false
     }
 
     ctx.res.on('close', () => {
@@ -22,15 +21,11 @@ router.get('/subscribe', async (ctx, next) => {
     });
 
     await new Promise((resolve, reject) => {
-        const intervalId = setInterval(() => {
-            if(subscribers[id] && subscribers[id].done) {
-                clearInterval(intervalId);
-                resolve();
-            } else if(!subscribers[id]) {
-                clearInterval(intervalId);
-            }
-        }, 300);
+        subscribers[id].resolve = resolve;
     })
+
+    ctx.status = 200;
+    ctx.message = 'Subscribed'
 });
 
 router.post('/publish', async (ctx, next) => {
@@ -43,11 +38,9 @@ router.post('/publish', async (ctx, next) => {
 
     for(let id in subscribers) {
         let subscriberContext = subscribers[id].ctx;
-        
-        subscriberContext.response.status = 200;
+        subscriberContext.status = 200;
         subscriberContext.body = ctx.request.body.message;
-
-        subscribers[id].done = true;
+        subscribers[id].resolve();
     }
 
     ctx.response.status = 200;
