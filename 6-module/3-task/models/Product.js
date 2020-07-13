@@ -50,5 +50,4 @@ const indexParams = {
 
 productSchema.index(indexes, indexParams);
 
-console.log(connection.collections); 
 module.exports = connection.model('Product', productSchema);
