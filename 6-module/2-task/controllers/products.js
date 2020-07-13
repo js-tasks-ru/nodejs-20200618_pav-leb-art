@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 
 module.exports.productsBySubcategory = async function productsBySubcategory(ctx, next) {
 	if (ctx.query.subcategory) {
-		console.log('SUB')
 		const products = await productModel.find({
 			subcategory: ctx.query.subcategory
 		}, '-__v')

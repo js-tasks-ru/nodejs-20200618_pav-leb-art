@@ -2,12 +2,13 @@ const mongoose = require('mongoose');
 const connection = require('../libs/connection');
 
 const schemaOptions = {
-  toJSON: {
-    virtuals: true
-  },
-  toObject: {
-    vistuals: true
-  }
+	toJSON: {
+		virtuals: true,
+		transform: (doc, ret, options) => {
+      ret.id = ret._id;
+      delete ret._id;
+		},
+	}
 }
 
 const subCategorySchema = new mongoose.Schema({
@@ -26,12 +27,5 @@ const categorySchema = new mongoose.Schema({
 
   subcategories: [subCategorySchema],
 }, schemaOptions);
-
-subCategorySchema.virtual('id').get(function () {
-  return this._id;
-});
-categorySchema.virtual('id').get(function () {
-  return this._id;
-});
 
 module.exports = connection.model('Category', categorySchema);
