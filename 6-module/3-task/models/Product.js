@@ -30,8 +30,6 @@ const productSchema = new mongoose.Schema({
 
   images: [String],
 
-}, {
-  autoIndex: false
 });
 
 const indexes = {
