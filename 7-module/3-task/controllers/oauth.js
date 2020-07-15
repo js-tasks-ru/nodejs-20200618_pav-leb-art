@@ -16,7 +16,7 @@ module.exports.oauth = async function oauth(ctx, next) {
 
 module.exports.oauthCallback = async function oauthCallback(ctx, next) {
   const provider = ctx.request.body.provider;
-
+  console.log('FROM CALLBACK', provider)
   await passport.authenticate(provider, async (err, user, info) => {
     if (err) throw err;
 
